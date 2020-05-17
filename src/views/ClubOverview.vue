@@ -1,12 +1,34 @@
 <template>
   <div class="container">
-    <section v-if="club" class="hero is-primary m-t-md">
+    <section v-if="club" class="hero is-danger m-t-md">
       <div class="hero-body">
         <div class="container">
           <h1 class="title">
             {{ club.Name }}
           </h1>
-          <h2 class="subtitle">Created: {{ club.DateCreated }}</h2>
+          <h2 v-if="club.Description" class="subtitle">
+            {{ club.Description }}
+          </h2>
+          <h2 class="subtitle ">
+            Created: {{ format(new Date(club.DateCreated), 'dd-MM-yyyy') }}
+          </h2>
+          <b-button
+            v-if="!isMember"
+            type="is-primary"
+            icon-left="plus"
+            @click="joinClub()"
+          >
+            Join
+          </b-button>
+          <b-button
+            v-if="isOwner"
+            type="is-light"
+            outlined
+            icon-left="delete"
+            @click="deleteClub()"
+          >
+            Delete Club
+          </b-button>
         </div>
       </div>
     </section>
@@ -15,6 +37,7 @@
       <b-tabs position="is-centered" class="block">
         <b-tab-item label="Assignments">
           <b-button
+            v-if="isOwner"
             size="is-large"
             icon-left="plus"
             @click="isModalActive = true"
@@ -35,9 +58,16 @@
               </a>
             </template>
           </div>
+
+          <div
+            v-else
+            class="column is-centered has-text-centered is-size-5 m-t-lg has-text-grey"
+          >
+            <p>This club has no assignments</p>
+          </div>
         </b-tab-item>
         <b-tab-item :label="membersTabText">
-          <div class="list is-hoverable">
+          <div v-if="members.length" class="list is-hoverable">
             <template v-for="member in members">
               <div :key="member.BookClubMemberId" class="list-item">
                 {{ member.Name }}
@@ -51,7 +81,8 @@
                   <b-icon class="has-text-yellow " icon="crown"></b-icon>
                 </b-tooltip>
                 <p :key="member.BookClubMemberId" class="has-text-grey-light">
-                  Joined: {{ member.DateJoined }}
+                  Joined:
+                  {{ formatDistanceToNow(new Date(member.DateJoined)) }}
                 </p>
               </div>
             </template>
@@ -66,7 +97,7 @@
             <p class="modal-card-title">Create Assignment</p>
           </header>
           <section class="modal-card-body">
-            <b-field label="Assignment name">
+            <b-field label="Name">
               <b-input
                 v-model="assignmentName"
                 type="text"
@@ -90,17 +121,38 @@
 </template>
 
 <script>
+import { format, formatDistanceToNow } from 'date-fns';
+import { mapState } from 'vuex';
+
 export default {
   data: () => ({
     club: null,
     members: [],
     isModalActive: false,
     assignments: [],
-    assignmentName: ''
+    assignmentName: '',
+    format,
+    formatDistanceToNow
   }),
   computed: {
+    ...mapState(['user']),
     membersTabText() {
       return `Members (${this.members.length})`;
+    },
+    isOwner() {
+      if (!this.members.length) {
+        return false;
+      }
+      const leader = this.members.find(m => m.IsLeader === true);
+
+      return leader && leader.UserId === this.user.Id;
+    },
+    isMember() {
+      console.log('asdasd');
+
+      return this.members.length
+        ? this.members.some(m => m.UserId === this.user.Id)
+        : false;
     }
   },
   created() {
@@ -117,6 +169,7 @@ export default {
       .dispatch('getClubMembers', id)
       .then(response => {
         this.members.push(...response);
+        console.log(this.members);
       })
       .catch(err => console.log(err));
 
@@ -146,6 +199,22 @@ export default {
       this.$router.push({
         name: 'Assignment',
         params: { assignmentId: assignment.AssignmentId }
+      });
+    },
+    joinClub() {
+      this.$store
+        .dispatch('postClubMember', {
+          UserId: this.user.Id,
+          BookClubId: this.club.BookClubId,
+          IsLeader: false
+        })
+        .then(response => {
+          this.members.push(response);
+        });
+    },
+    deleteClub() {
+      this.$store.dispatch('deleteClub', this.club.BookClubId).then(() => {
+        this.$router.push({ name: 'clubs' });
       });
     }
   }

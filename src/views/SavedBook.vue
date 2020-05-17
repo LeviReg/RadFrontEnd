@@ -10,7 +10,9 @@
                   </figure>
                 </div> -->
       <div class="card-content">
-        <p class="subtitle is-6">Added: {{ book.DateCreated }}</p>
+        <p class="subtitle is-6">
+          Added: {{ format(new Date(book.DateCreated), 'dd-MM-yyyy') }}
+        </p>
 
         <div class="media">
           <div class="media-left">

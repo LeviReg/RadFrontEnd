@@ -7,7 +7,7 @@
             <div
               v-for="club in allClubs"
               :key="club.BookClubId"
-              class="column is-3"
+              class="column is-3 pointer is-hoverable"
               @click="gotoBookClub(club)"
             >
               <div class="card">
@@ -21,6 +21,18 @@
               </div>
             </div>
           </template>
+          <div
+            v-else
+            class="column is-centered has-text-centered is-size-5 m-t-lg has-text-grey"
+          >
+            <p class="m-b-xs">The silence is so freaking loud!</p>
+            <a
+              class=" is-primary has-text-weight-bold"
+              @click="isModalActive = true"
+            >
+              Create the first club!
+            </a>
+          </div>
         </div>
       </b-tab-item>
       <b-tab-item label="My Clubs">
@@ -38,7 +50,7 @@
             <div
               v-for="club in myClubs"
               :key="club.BookClubId"
-              class="column is-3"
+              class="column is-3 pointer"
               @click="gotoBookClub(club)"
             >
               <div class="card">
@@ -52,6 +64,13 @@
               </div>
             </div>
           </template>
+          <div
+            v-else
+            class="column is-centered has-text-centered is-size-5 m-t-lg has-text-grey"
+          >
+            <p>You are not a part of any clubs yet...</p>
+            <p>Join a club or create one of your own!</p>
+          </div>
         </div>
       </b-tab-item>
     </b-tabs>
@@ -69,6 +88,16 @@
                 type="text"
                 :value="name"
                 placeholder="Name..."
+                required
+              >
+              </b-input>
+            </b-field>
+            <b-field label="Description">
+              <b-input
+                v-model="description"
+                type="text"
+                :value="description"
+                placeholder="What is your club about"
                 required
               >
               </b-input>
@@ -96,14 +125,16 @@ export default {
     allClubs: [],
     name: '',
     isModalActive: false,
-    format
+    format,
+    description: ''
   }),
   methods: {
     ...mapActions(['postClub', 'getMyClubs']),
     submitPostClub() {
-      this.postClub({ name: this.name })
+      this.postClub({ name: this.name, description: this.description })
         .then(response => {
           this.myClubs.push(response);
+          this.allClubs.push(response);
           this.isModalActive = false;
         })
         .catch(err => console.log(err));

@@ -81,7 +81,7 @@
             <button class="button" type="button" @click="isModalActive = false">
               Close
             </button>
-            <button class="button is-primary" type="submit">Add</button>
+            <button class="button is-primary" type="submit">Yes</button>
           </footer>
         </div>
       </form>

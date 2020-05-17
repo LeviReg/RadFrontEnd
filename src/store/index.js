@@ -46,7 +46,6 @@ export default new Vuex.Store({
         .post('/token', body)
         .then(res => {
           commit('updateToken', res.data.access_token);
-          commit('updateUser', res.data);
           return res.data;
         })
         .catch(err => console.log(err));
@@ -118,6 +117,14 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err));
     },
+    postClubMember(_, data) {
+      return http
+        .post('/api/bookclubmembers', data)
+        .then(res => {
+          return res.data;
+        })
+        .catch(err => console.log(err));
+    },
     getAssignmentsByClub(_, bookClubId) {
       return http
         .get(`/api/assignments/club/${bookClubId}`)
@@ -153,6 +160,24 @@ export default new Vuex.Store({
     getBooksByAssignment(assignmentId) {
       return http
         .get(`/api/books/assignment/${assignmentId}`)
+        .then(res => {
+          return res.data;
+        })
+        .catch(err => console.log(err));
+    },
+    getUserInfo({ commit }) {
+      return http
+        .get('/api/account/userinfo')
+        .then(res => {
+          commit('updateUser', res.data);
+
+          return res.data;
+        })
+        .catch(err => console.log(err));
+    },
+    deleteClub(_, BookClubId) {
+      return http
+        .delete(`/api/bookclubs/${BookClubId}`)
         .then(res => {
           return res.data;
         })

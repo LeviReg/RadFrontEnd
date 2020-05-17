@@ -138,7 +138,7 @@
             <b-checkbox>Remember me</b-checkbox>
           </section>
           <footer class="modal-card-foot">
-            <button class="button" type="button" @click="$parent.close()">
+            <button class="button" type="button" @click="isModalActive = false">
               Close
             </button>
             <button class="button is-primary" type="submit">Login</button>
@@ -152,7 +152,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   data() {
@@ -169,6 +169,7 @@ export default {
     ...mapState(['accessToken'])
   },
   methods: {
+    ...mapActions(['getUserInfo']),
     login() {
       this.$store
         .dispatch('login', { email: this.email, password: this.password })
@@ -176,6 +177,7 @@ export default {
           console.log(res);
           this.isModalActive = false;
           this.$router.push({ path: '/clubs' });
+          this.getUserInfo();
         })
         .catch(err => console.log(err));
     },
@@ -204,8 +206,19 @@ export default {
         })
         .catch(err => console.log(err));
     }
+  },
+  created() {
+    if (this.accessToken) {
+      console.log('iin created');
+
+      this.getUserInfo();
+    }
   }
 };
 </script>
 
-<style></style>
+<style>
+.pointer {
+  cursor: pointer;
+}
+</style>

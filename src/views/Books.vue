@@ -26,6 +26,12 @@
               <SavedBook :book="myBook" />
             </div>
           </template>
+          <div
+            v-else
+            class="column is-centered has-text-centered is-size-5 m-t-lg has-text-grey"
+          >
+            <p>You haven't added any books to your collection yet</p>
+          </div>
         </div>
       </b-tab-item>
     </b-tabs>

@@ -53,6 +53,6 @@ export default {
 
 <style scoped>
 .is-ancestor {
-  margin-top: 200px !important;
+  margin-top: 150px !important;
 }
 </style>
