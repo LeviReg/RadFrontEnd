@@ -39,7 +39,9 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    login({ commit }, loginDetails) {
+    login({
+      commit
+    }, loginDetails) {
       const body = `username=${loginDetails.email}&password=${loginDetails.password}&grant_type=password`;
 
       return http
@@ -74,7 +76,9 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err));
     },
-    logout({ commit }) {
+    logout({
+      commit
+    }) {
       return http
         .post('/api/account/logout')
         .then(res => {
@@ -165,7 +169,9 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err));
     },
-    getUserInfo({ commit }) {
+    getUserInfo({
+      commit
+    }) {
       return http
         .get('/api/account/userinfo')
         .then(res => {
