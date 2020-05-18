@@ -1,14 +1,6 @@
 <template>
   <div>
     <div class="card">
-      <!-- <div class="card-image">
-                  <figure class="image is-3by2">
-                    <img
-                      :src="book.volumeInfo.imageLinks.thumbnail"
-                      alt="Placeholder image"
-                    />
-                  </figure>
-                </div> -->
       <div class="card-content">
         <div class="media">
           <div class="media-left">
@@ -51,7 +43,7 @@
               <br />
               <a :href="book.volumeInfo.previewLink">Preview</a>
               <br />
-              <time
+              <time v-if="book.volumeInfo.publishedDate"
                 >Published:
                 {{
                   format(new Date(book.volumeInfo.publishedDate), 'dd-MM-yyyy')
@@ -63,8 +55,6 @@
       </div>
       <footer class="card-footer">
         <a class="card-footer-item" @click="isModalActive = true">Add</a>
-        <!-- <a href="#" class="card-footer-item">Edit</a>
-              <a href="#" class="card-footer-item">Delete</a> -->
       </footer>
     </div>
 
@@ -74,9 +64,13 @@
           <header class="modal-card-head">
             <p class="modal-card-title">Add book</p>
           </header>
-          <section class="modal-card-body">
+          <section v-if="!assignment" class="modal-card-body">
             <p>Are you sure you want to add this book to your collection?</p>
           </section>
+          <section v-else class="modal-card-body">
+            <p>Are you sure you want to add this book to this assignment?</p>
+          </section>
+
           <footer v-if="!inCollection" class="modal-card-foot">
             <button class="button" type="button" @click="isModalActive = false">
               Close
@@ -93,7 +87,7 @@
 import { format } from 'date-fns';
 
 export default {
-  props: ['book', 'inCollection'],
+  props: ['book', 'inCollection', 'assignment'],
   data() {
     return {
       format,
@@ -114,10 +108,15 @@ export default {
             ? this.book.volumeInfo.categories[0]
             : '',
           CoverURL: this.book.volumeInfo.imageLinks.thumbnail,
-          Description: this.book.volumeInfo.description
+          Description: this.book.volumeInfo.description,
+          AssignmentId: this.assignment ? this.$route.params.assignmentId : null
         })
-        .then(() => {
+        .then(response => {
           this.isModalActive = false;
+
+          if (this.assignment) {
+            this.$emit('bookAdded', response);
+          }
         })
         .catch(err => console.log(err));
     }

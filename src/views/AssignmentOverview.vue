@@ -6,75 +6,62 @@
           <h1 class="title">
             {{ assignment.Name }}
           </h1>
-          <h2 class="subtitle">Created: {{ assignment.DateCreated }}</h2>
+          <h2 class="subtitle">
+            Created:
+            {{
+              formatDistanceToNow(new Date(assignment.DateCreated), {
+                addSuffix: true
+              })
+            }}
+          </h2>
         </div>
       </div>
     </section>
-    <b-button size="is-large" icon-left="plus" @click="isModalActive = true">
+    <b-button
+      size="is-large"
+      icon-left="plus"
+      class="m-t-md"
+      @click="isModalActive = true"
+    >
       Add book
     </b-button>
-    <div class="list is-hoverable">
+    <p v-if="books.length" class="m-t-lg m-b-sm">
+      Books in assignment
+      <span class="has-text-primary has-text-weight-bold"
+        >({{ books.length }})</span
+      >
+    </p>
+    <div v-if="books.length" class="list">
       <template v-for="book in books">
-        <div :key="book.BookId" class="list-item">
-          {{ book.Title }}
+        <a :key="book.BookId" class="list-item">
+          <p class="has-text-primary">{{ book.Title }}</p>
           <p class="has-text-grey-light is-pulled-right">
-            Joined: {{ book.Author }}
+            {{ book.Genre }}
           </p>
-        </div>
+          <p>By: {{ book.Author }}</p>
+          <p class="has-text-grey-light m-b-md">
+            Added: {{ formatDistanceToNow(new Date(book.DateCreated)) }}
+          </p>
+          <p :key="book.BookId" class="has-text-grey-light">
+            {{ book.Description }}
+          </p>
+        </a>
       </template>
     </div>
-
-    <!-- <section>
-      <b-tabs position="is-centered" class="block">
-        <b-tab-item label="Assignments">
-          <b-button
-            size="is-large"
-            icon-left="plus"
-            @click="isModalActive = true"
-          >
-            Create assignment
-          </b-button>
-          <div class="list is-hoverable m-t-md">
-            <template v-for="assignment in assignments">
-              <a :key="assignment.AssignmentId" class="list-item">
-                {{ assignment.Name }}
-                <p class="has-text-grey-light">
-                  Created: {{ assignment.DateCreated }}
-                </p>
-              </a>
-            </template>
-          </div>
-        </b-tab-item>
-        <b-tab-item :label="membersTabText">
-          <div class="list is-hoverable">
-            <template v-for="member in members">
-              <div :key="member.BookClubMemberId" class="list-item">
-                {{ member.Name }}
-
-                <b-tooltip
-                  v-if="member.IsLeader"
-                  label="Leader"
-                  position="is-right"
-                  class="is-pulled-right"
-                >
-                  <b-icon class="has-text-yellow " icon="crown"></b-icon>
-                </b-tooltip>
-                <p :key="member.BookClubMemberId" class="has-text-grey-light">
-                  Joined: {{ member.DateJoined }}
-                </p>
-              </div>
-            </template>
-          </div>
-        </b-tab-item>
-      </b-tabs>
-    </section> -->
-    <b-modal :active.sync="isModalActive" :width="640" scroll="keep">
-      <Search />
+    <div
+      v-else
+      class="column is-centered has-text-centered is-size-5 m-t-lg has-text-grey"
+    >
+      <p>This collection has no books yet</p>
+    </div>
+    <b-modal :active.sync="isModalActive" scroll="keep">
+      <Search :assignment="true" @addToAssignment="bookToAssignment" />
     </b-modal>
   </div>
 </template>
 
 <script>
+import { format, formatDistanceToNow } from 'date-fns';
 import Search from './Search';
 export default {
   components: {
@@ -83,7 +70,9 @@ export default {
   data: () => ({
     assignment: null,
     books: [],
-    isModalActive: false
+    isModalActive: false,
+    format,
+    formatDistanceToNow
   }),
   created() {
     const id = this.$route.params.assignmentId;
@@ -94,8 +83,21 @@ export default {
         this.assignment = response;
       })
       .catch(err => console.log(err));
+
+    this.$store
+      .dispatch('getBooksByAssignment', id)
+      .then(response => {
+        this.books.push(...response);
+      })
+      .catch(err => console.log(err));
   },
-  methods: {}
+  methods: {
+    bookToAssignment(item) {
+      this.books.push(item);
+
+      this.isModalActive = false;
+    }
+  }
 };
 </script>
 

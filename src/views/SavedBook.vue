@@ -1,14 +1,6 @@
 <template>
   <div>
     <div class="card">
-      <!-- <div class="card-image">
-                  <figure class="image is-3by2">
-                    <img
-                      :src="book.volumeInfo.imageLinks.thumbnail"
-                      alt="Placeholder image"
-                    />
-                  </figure>
-                </div> -->
       <div class="card-content">
         <p class="subtitle is-6">
           Added: {{ format(new Date(book.DateCreated), 'dd-MM-yyyy') }}
@@ -25,10 +17,6 @@
             <p class="subtitle is-6">
               {{ book.Author }}
             </p>
-            <!-- <b-rate
-              v-model="book.volumeInfo.averageRating"
-              :show-score="true"
-            ></b-rate> -->
           </div>
         </div>
 

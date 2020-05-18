@@ -2,18 +2,7 @@
   <div class="container">
     <b-tabs position="is-centered" class="block" @input="getMyBooks()">
       <b-tab-item label="Browse">
-        <!-- <b-field label="Search">
-          <b-input v-model="query" @change.native="onSearch"></b-input>
-        </b-field>
-
-        <div class="columns is-multiline">
-          <template v-if="books && books.length">
-            <div v-for="book in books" :key="book.etag" class="column is-3">
-              <Book :book="book" />
-            </div>
-          </template>
-        </div> -->
-        <Search />
+        <Search :assignment="false" />
       </b-tab-item>
       <b-tab-item label="My Collection">
         <div class="columns is-multiline">

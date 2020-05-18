@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 
 const http = axios.create({
-  baseURL: 'https://localhost:44375/'
+  baseURL: 'https://localhost:44350'
 });
 
 http.interceptors.request.use(
@@ -157,7 +157,7 @@ export default new Vuex.Store({
         })
         .catch(err => console.log(err));
     },
-    getBooksByAssignment(assignmentId) {
+    getBooksByAssignment(_, assignmentId) {
       return http
         .get(`/api/books/assignment/${assignmentId}`)
         .then(res => {

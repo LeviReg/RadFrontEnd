@@ -82,7 +82,11 @@
                 </b-tooltip>
                 <p :key="member.BookClubMemberId" class="has-text-grey-light">
                   Joined:
-                  {{ formatDistanceToNow(new Date(member.DateJoined)) }}
+                  {{
+                    formatDistanceToNow(new Date(member.DateJoined), {
+                      addSuffix: true
+                    })
+                  }}
                 </p>
               </div>
             </template>
@@ -148,8 +152,6 @@ export default {
       return leader && leader.UserId === this.user.Id;
     },
     isMember() {
-      console.log('asdasd');
-
       return this.members.length
         ? this.members.some(m => m.UserId === this.user.Id)
         : false;
@@ -169,7 +171,6 @@ export default {
       .dispatch('getClubMembers', id)
       .then(response => {
         this.members.push(...response);
-        console.log(this.members);
       })
       .catch(err => console.log(err));
 
@@ -189,9 +190,8 @@ export default {
       this.$store
         .dispatch('postAssignment', assignmentData)
         .then(response => {
-          console.log(response);
-
           this.assignments.push(response);
+          this.isModalActive = false;
         })
         .catch(err => console.log(err));
     },
@@ -206,7 +206,8 @@ export default {
         .dispatch('postClubMember', {
           UserId: this.user.Id,
           BookClubId: this.club.BookClubId,
-          IsLeader: false
+          IsLeader: false,
+          Name: this.user.Email
         })
         .then(response => {
           this.members.push(response);
